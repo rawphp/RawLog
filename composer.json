@@ -1,0 +1,29 @@
+{
+    "name": "rawphp/raw-log",
+    "type": "library",
+    "description": "RawLog is a wrapper around Monolog and is used by RawPHP framework and other applications.",
+    "keywords": [ "log" ],
+    "homepage": "http://rawphp.org",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tom Kaczocha",
+            "email": "tom@rawphp.org"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "rawphp/raw-base": "dev-master",
+        "rawphp/raw-mail": "dev-master",
+        "monolog/monolog": "1.10.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.2.5",
+        "squizlabs/php_codesniffer": "1.*"
+    },
+    "autoload": {
+        "classmap": [
+            "lib/"
+        ]
+    }
+}
