@@ -14,7 +14,7 @@
     "require": {
         "php": ">=5.4.0",
         "rawphp/raw-base": "0.1.0",
-        "rawphp/raw-mail": "0.1.0",
+        "rawphp/raw-mail": "0.1.1",
         "monolog/monolog": "1.10.0"
     },
     "require-dev": {
