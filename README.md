@@ -11,12 +11,12 @@
 ### Composer
 RawLog is available via [Composer/Packagist](https://packagist.org/packages/rawphp/raw-log).
 
-Add `"rawphp/raw-log": "0.1.1"` to the require block in your composer.json and then run `composer install`.
+Add `"rawphp/raw-log": "0.1.3"` to the require block in your composer.json and then run `composer install`.
 
 ```json
 {
         "require": {
-            "rawphp/raw-log": "0.1.1"
+            "rawphp/raw-log": "0.1.3"
         }
 }
 ```
@@ -24,7 +24,7 @@ Add `"rawphp/raw-log": "0.1.1"` to the require block in your composer.json and t
 You can also simply run the following from the command line:
 
 ```sh
-composer require rawphp/raw-log "0.1.1"
+composer require rawphp/raw-log "0.1.3"
 ```
 
 ### Tarball
