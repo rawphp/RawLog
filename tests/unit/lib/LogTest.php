@@ -42,7 +42,7 @@ use RawPHP\RawMail\Mail;
  * This is the logging class.
  * 
  * @category  PHP
- * @package   RawPHP/Core
+ * @package   RawPHP/RawLog
  * @author    Tom Kaczocha <tom@rawphp.org>
  * @copyright 2014 Tom Kaczocha
  * @license   http://rawphp.org/license.txt MIT
