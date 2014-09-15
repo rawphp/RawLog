@@ -1,5 +1,7 @@
 # RawLog - A Simple Log Wrapper for Monolog
 
+[![Build Status](https://travis-ci.org/rawphp/RawLog.svg?branch=master)](https://travis-ci.org/rawphp/RawLog)
+
 ## Package Features
 - Supports logging to single file or rotating files, one for each day
 - Supports sending emails (with SMTP if desired)
