@@ -164,8 +164,6 @@ class LogTest extends \PHPUnit_Framework_TestCase
      */
     public function formatCallback( $content, $records )
     {
-        echo PHP_EOL . $content . PHP_EOL;
-        
         $this->_callbackWorks = TRUE;
         
         return 'blah';

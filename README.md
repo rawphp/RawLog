@@ -1,6 +1,6 @@
-# RawLog - A Simple Log Wrapper for Monolog
+# RawLog - A Simple Log Wrapper for Monolog [![Build Status](https://travis-ci.org/rawphp/RawLog.svg?branch=master)](https://travis-ci.org/rawphp/RawLog)
 
-[![Build Status](https://travis-ci.org/rawphp/RawLog.svg?branch=master)](https://travis-ci.org/rawphp/RawLog)
+[![Latest Stable Version](https://poser.pugx.org/rawphp/raw-log/v/stable.svg)](https://packagist.org/packages/rawphp/raw-log) [![Total Downloads](https://poser.pugx.org/rawphp/raw-log/downloads.svg)](https://packagist.org/packages/rawphp/raw-log) [![Latest Unstable Version](https://poser.pugx.org/rawphp/raw-log/v/unstable.svg)](https://packagist.org/packages/rawphp/raw-log) [![License](https://poser.pugx.org/rawphp/raw-log/license.svg)](https://packagist.org/packages/rawphp/raw-log)
 
 ## Package Features
 - Supports logging to single file or rotating files, one for each day

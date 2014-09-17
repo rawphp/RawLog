@@ -87,6 +87,8 @@ class Log extends Component implements ILog
      */
     public function init( $config = array( ) )
     {
+        parent::init( $config );
+        
         $this->addFilter( self::ON_LOG_BUILD_HANDLER_FILTER, array( $this, 'isIHandlerFilter' ) );
         
         foreach( $config as $key => $value )
@@ -384,8 +386,6 @@ class Log extends Component implements ILog
      */
     public function isIHandlerFilter( $handler, $type )
     {
-        echo 'checking handler type';
-        
         if ( !$handler instanceof IHandler )
         {
             throw new LogException( get_class( $handler ) . ' is not a IHandler. Requested( ' . $type . ' )' );
