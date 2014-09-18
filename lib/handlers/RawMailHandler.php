@@ -37,7 +37,6 @@ namespace RawPHP\RawLog\Handlers;
 
 use Monolog\Handler\MailHandler;
 use Monolog\Logger;
-use RawPHP\RawBase\Exceptions\RawException;
 use RawPHP\RawMail\Mail;
 use RawPHP\RawLog\IHandler;
 use RawPHP\RawLog\Log;
@@ -71,8 +70,6 @@ class RawMailHandler extends MailHandler implements IHandler
      * @param Mail $mail   instance of Mail class
      * @param int  $level  the minimumm level at which this handler will be triggered
      * @param bool $bubble whether the messages that are handled can bubble up the stack or not
-     * 
-     * @throws RawException if message is not a string
      */
     public function __construct( Log &$log, Mail $mail, $level = Logger::DEBUG, $bubble = TRUE )
     {

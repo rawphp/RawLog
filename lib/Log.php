@@ -35,14 +35,14 @@
 
 namespace RawPHP\RawLog;
 
-use RawPHP\RawBase\Component;
-use RawPHP\RawLog\ILog;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use RawPHP\RawMail\MailException;
+use RawPHP\RawBase\Component;
 use RawPHP\RawLog\Handlers\RawMailHandler;
 use RawPHP\RawLog\Handlers\LogHandler;
 use RawPHP\RawLog\Handlers\RotatingLogHandler;
+use RawPHP\RawLog\ILog;
+use RawPHP\RawMail\MailException;
 
 /**
  * This is the logging class.

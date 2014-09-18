@@ -88,5 +88,8 @@ Please submit bug reports, suggestions and pull requests to the [GitHub issue tr
 
 ## Changelog
 
+#### 18-09-2014
+- Updated to work with the latest rawphp/rawbase package.
+
 #### 14-09-2014
 - Initial Code Commit
