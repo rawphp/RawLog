@@ -33,13 +33,36 @@
  * @link      http://rawphp.org/
  */
 
+use RawPHP\RawYaml\Yaml;
+
 defined( 'DS' )          || define( 'DS', DIRECTORY_SEPARATOR );
+
 defined( 'TEST_DIR' )    || define( 'TEST_DIR', dirname( __FILE__ ) . DS );
 defined( 'SUPPORT_DIR' ) || define( 'SUPPORT_DIR', TEST_DIR . '_support' . DS );
 defined( 'OUTPUT_DIR' )  || define( 'OUTPUT_DIR', TEST_DIR . '_output' . DS );
 
 require_once dirname( dirname( __FILE__ ) ) . DS . 'vendor' . DS . 'autoload.php';
 
-$config = include_once SUPPORT_DIR . 'config.php';
+$config = ( new Yaml( ) )->load( SUPPORT_DIR . 'config.yml' );
+$config[ 'log_file' ] = fixPath( $config[ 'log_file' ] );
 
 echo PHP_EOL . PHP_EOL . '************* BOOTSTRAP ********************' . PHP_EOL . PHP_EOL;
+
+
+/**
+ * Helper function to cleanup migration path in configuration.
+ * 
+ * @param string $path migration path
+ * 
+ * @return string migration path
+ */
+function fixPath( $path )
+{
+    // fix path
+    if ( FALSE !== strstr( $path, '%OUTPUT_DIR%' ) )
+    {
+        $path = str_replace( '%OUTPUT_DIR%', OUTPUT_DIR, $path );
+    }
+    
+    return $path;
+}

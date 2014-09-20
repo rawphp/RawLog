@@ -50,5 +50,4 @@ use RawPHP\RawLog\IHandler;
  */
 class RotatingLogHandler extends RotatingFileHandler implements IHandler
 {
-    
 }

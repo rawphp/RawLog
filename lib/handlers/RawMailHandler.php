@@ -66,7 +66,7 @@ class RawMailHandler extends MailHandler implements IHandler
     /**
      * Handler constructor.
      * 
-     * @param Log  &$log   reference to the owner log
+     * @param Log  $log    reference to the owner log
      * @param Mail $mail   instance of Mail class
      * @param int  $level  the minimumm level at which this handler will be triggered
      * @param bool $bubble whether the messages that are handled can bubble up the stack or not
