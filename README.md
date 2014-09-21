@@ -1,6 +1,8 @@
-# RawLog - A Simple Log Wrapper for Monolog [![Build Status](https://travis-ci.org/rawphp/RawLog.svg?branch=master)](https://travis-ci.org/rawphp/RawLog)
+# RawLog - A Simple Log Wrapper for Monolog
 
-[![Latest Stable Version](https://poser.pugx.org/rawphp/raw-log/v/stable.svg)](https://packagist.org/packages/rawphp/raw-log) [![Total Downloads](https://poser.pugx.org/rawphp/raw-log/downloads.svg)](https://packagist.org/packages/rawphp/raw-log) [![Latest Unstable Version](https://poser.pugx.org/rawphp/raw-log/v/unstable.svg)](https://packagist.org/packages/rawphp/raw-log) [![License](https://poser.pugx.org/rawphp/raw-log/license.svg)](https://packagist.org/packages/rawphp/raw-log)
+[![Build Status](https://travis-ci.org/rawphp/RawLog.svg?branch=master)](https://travis-ci.org/rawphp/RawLog) [![Coverage Status](https://coveralls.io/repos/rawphp/RawLog/badge.png)](https://coveralls.io/r/rawphp/RawLog)
+[![Latest Stable Version](https://poser.pugx.org/rawphp/raw-log/v/stable.svg)](https://packagist.org/packages/rawphp/raw-log) [![Total Downloads](https://poser.pugx.org/rawphp/raw-log/downloads.svg)](https://packagist.org/packages/rawphp/raw-log) 
+[![Latest Unstable Version](https://poser.pugx.org/rawphp/raw-log/v/unstable.svg)](https://packagist.org/packages/rawphp/raw-log) [![License](https://poser.pugx.org/rawphp/raw-log/license.svg)](https://packagist.org/packages/rawphp/raw-log)
 
 ## Package Features
 - Supports logging to single file or rotating files, one for each day
@@ -87,6 +89,9 @@ This package is licensed under the [MIT](https://github.com/rawphp/RawLog/blob/m
 Please submit bug reports, suggestions and pull requests to the [GitHub issue tracker](https://github.com/rawphp/RawLog/issues).
 
 ## Changelog
+
+#### 22-09-2014
+- Updated to PHP 5.3.
 
 #### 20-09-2014
 - Replaced php array configuration with yaml
