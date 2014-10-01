@@ -60,8 +60,6 @@ class ErrorLogFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp( )
     {
-
-
         $this->formatter = new ErrorLogFormatter( );
     }
 
@@ -88,13 +86,13 @@ class ErrorLogFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $record = new ErrorLogRecord( Log::LEVEL_ERROR, 'This is the error message' );
         $date  = new \DateTime( );
-        //$date->setTimezone( new \DateTimeZone( 'EST' ) );
+        $date->setTimezone( new \DateTimeZone( 'UTC' ) );
         $date->setDate( 2014, 10, 01 );
         $date->setTime( 23, 14, 55 );
 
         $record->setDate( $date );
 
-        $expected = '[Wed Oct 01 23:14:55 EST] [ERROR] [-] This is the error message';
+        $expected = '[Wed Oct 01 23:14:55 UTC] [ERROR] [-] This is the error message';
 
         $this->assertEquals( $expected, trim( $this->formatter->format( $record ) ) );
     }
