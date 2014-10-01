@@ -33,12 +33,12 @@
  * @link      http://rawphp.org/
  */
 
-namespace RawPHP\RawLog;
+namespace RawPHP\RawLog\Handlers;
 
 use RawPHP\RawLog\IRecord;
 
 /**
- * The log handler interface.
+ * This is the rotating file logging class.
  *
  * @category  PHP
  * @package   RawPHP/RawLog
@@ -47,56 +47,8 @@ use RawPHP\RawLog\IRecord;
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
-interface IHandler
+class RotatingFileHandler extends FileHandler
 {
-    /**
-     * Initialises the handler.
-     *
-     * @param array $config configuration array
-     *
-     * @action ON_INIT_ACTION
-     */
-    public function init( $config = array( ) );
-
-    /**
-     * Returns the minimum log level.
-     *
-     * @filter ON_GET_LEVEL_FILTER(1)
-     *
-     * @return int log level
-     */
-    public function getLevel( );
-
-    /**
-     * Returns the formatter to be used with this handler.
-     *
-     * @filter ON_GET_FORMATTER_FILTER(1)
-     *
-     * @return IFormatter the formatter
-     */
-    public function getFormatter( );
-
-    /**
-     * Sets the formatter for this handler.
-     *
-     * @param IFormatter $formatter the formatter
-     *
-     * @filter ON_SET_FORMATTER_FILTER(1)
-     */
-    public function setFormatter( IFormatter $formatter );
-
-    /**
-     * Creates and returns a new record.
-     *
-     * @param int   $level the log level
-     * @param array $args  the log message
-     *
-     * @filter ON_CREATE_RECORD_FILTER(3)
-     *
-     * @return IRecord the record instance
-     */
-    public function createRecord( $level, array $args );
-
     /**
      * Handles the logging.
      *
@@ -110,5 +62,20 @@ interface IHandler
      *
      * @throws LogException if it fails to create the file.
      */
-    public function handle( IRecord $record );
+    public function handle( IRecord $record )
+    {
+        $date = new \DateTime( );
+
+        if ( FALSE === strstr( $this->fileName, $date->format( 'd-m-Y' ) ) )
+        {
+            $info = pathinfo( $this->fileName );
+
+            $this->fileName  = $info[ 'dirname' ] . DIRECTORY_SEPARATOR;
+            $this->fileName .= $info[ 'filename' ] . '-';
+            $this->fileName .= $date->format( 'd-m-Y' );
+            $this->fileName .= '.' . $info[ 'extension' ];
+        }
+
+        parent::handle( $record );
+    }
 }

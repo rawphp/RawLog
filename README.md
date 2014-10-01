@@ -4,6 +4,8 @@
 [![Latest Stable Version](https://poser.pugx.org/rawphp/raw-log/v/stable.svg)](https://packagist.org/packages/rawphp/raw-log) [![Total Downloads](https://poser.pugx.org/rawphp/raw-log/downloads.svg)](https://packagist.org/packages/rawphp/raw-log) 
 [![Latest Unstable Version](https://poser.pugx.org/rawphp/raw-log/v/unstable.svg)](https://packagist.org/packages/rawphp/raw-log) [![License](https://poser.pugx.org/rawphp/raw-log/license.svg)](https://packagist.org/packages/rawphp/raw-log)
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/68ab07d4-f4ba-44a6-8003-4344778463f2/big.png)](https://insight.sensiolabs.com/projects/68ab07d4-f4ba-44a6-8003-4344778463f2)
+
 ## Package Features
 - Supports logging to single file or rotating files, one for each day
 - Supports sending emails (with SMTP if desired)
@@ -89,6 +91,10 @@ This package is licensed under the [MIT](https://github.com/rawphp/RawLog/blob/m
 Please submit bug reports, suggestions and pull requests to the [GitHub issue tracker](https://github.com/rawphp/RawLog/issues).
 
 ## Changelog
+
+#### 01-10-2014
+- Removed Monolog dependency.
+- Rebuilt log from scratch - inspired by Monolog features
 
 #### 22-09-2014
 - Updated to PHP 5.3.

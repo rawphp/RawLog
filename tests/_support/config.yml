@@ -37,12 +37,23 @@
 #
 ################################################################################ 
 
-log_file: %OUTPUT_DIR%log.txt
-log_name: test-log
-log_type:
-    - standard_log
-    - rotate_log
-    - raw_mail
+class: RawPHP\RawLog\Log
+debug: FALSE
+handlers:
+    standard_log: 
+        class: RawPHP\RawLog\Handlers\FileHandler
+        file: %OUTPUT_DIR%log.txt
+        formatter: RawPHP\RawLog\Formatters\ErrorLogFormatter
+        level: 0
+    rotate_log:
+        class: RawPHP\RawLog\Handlers\RotatingFileHandler
+        file: %OUTPUT_DIR%rotate.txt
+        formatter: RawPHP\RawLog\Formatters\ErrorLogFormatter
+        level: 2
+    mail:
+        class: RawPHP\RawLog\Handlers\MailHandler
+        formatter: RawPHP\RawLog\Formatters\MailLogFormatter
+        level: 4
 
 
 ################################################################################

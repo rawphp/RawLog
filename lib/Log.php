@@ -2,19 +2,19 @@
 
 /**
  * This file is part of RawPHP - a PHP Framework.
- * 
+ *
  * Copyright (c) 2014 RawPHP.org
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,9 +22,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- * 
+ *
  * PHP version 5.3
- * 
+ *
  * @category  PHP
  * @package   RawPHP/RawLog
  * @author    Tom Kaczohca <tom@rawphp.org>
@@ -35,18 +35,12 @@
 
 namespace RawPHP\RawLog;
 
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 use RawPHP\RawBase\Component;
-use RawPHP\RawLog\Handlers\RawMailHandler;
-use RawPHP\RawLog\Handlers\LogHandler;
-use RawPHP\RawLog\Handlers\RotatingLogHandler;
 use RawPHP\RawLog\ILog;
-use RawPHP\RawMail\MailException;
 
 /**
  * This is the logging class.
- * 
+ *
  * @category  PHP
  * @package   RawPHP/RawLog
  * @author    Tom Kaczocha <tom@rawphp.org>
@@ -56,356 +50,262 @@ use RawPHP\RawMail\MailException;
  */
 class Log extends Component implements ILog
 {
-    protected $monoLog;
-    
     /**
-     * @var string
+     * @var array
      */
-    public $name                = 'log';
-    /**
-     * @var string
-     */
-    public $logFile             = NULL;
-    /**
-     * @var int
-     */
-    public $maxFiles            = 10;
-    public $types               = array( );
-    public $mailer              = NULL;
-    public $to                  = NULL;
-    public $subject             = '';
-    public $formatCallback      = NULL;
-    
+    private $_handlers              = array( );
+
     /**
      * Initialises the log.
-     * 
+     *
      * @param array $config configuration array
-     * 
+     *
      * @action ON_INIT_ACTION
-     * 
+     *
      * @throws LogException if log file is missing
      */
     public function init( $config = array( ) )
     {
         parent::init( $config );
-        
-        $this->addFilter( self::ON_LOG_BUILD_HANDLER_FILTER, array( $this, 'isIHandlerFilter' ) );
-        
-        foreach( $config as $key => $value )
+
+        $handlers = array_values( $config[ 'handlers' ] );
+
+        foreach( $handlers as $conf )
         {
-            switch( $key )
-            {
-                case 'log_name':
-                    $this->name = $value;
-                    break;
-                
-                case 'log_type':
-                    if ( is_array( $value ) )
-                    {
-                        $this->types = $value;
-                    }
-                    else
-                    {
-                        $this->types[] = $value;
-                    }
-                    break;
-                
-                case 'mailer':
-                    $this->mailer = $value;
-                    break;
-                
-                case 'to_address':
-                    if ( NULL === $this->to )
-                    {
-                        $this->to = array( );
-                    }
-                    $this->to[ 'address' ] = $value;
-                    break;
-                
-                case 'to_name':
-                    if ( NULL === $this->to )
-                    {
-                        $this->to = array( );
-                    }
-                    $this->to[ 'name' ] = $value;
-                    break;
-                
-                case 'subject':
-                    $this->subject = $value;
-                    break;
-                
-                case 'format_callback':
-                    $this->formatCallback = $value;
-                    break;
-                
-                case 'log_file':
-                    $this->logFile = $value;
-                    break;
-                
-                case 'max_files':
-                    $this->maxFiles = $value;
-                    break;
-                
-                default:
-                    // do nothing
-                    break;
-            }
+            $class = $conf[ 'class' ];
+
+            $handler = new $class( $conf );
+
+            $this->addHandler( $handler );
         }
-        
-        if ( NULL == $this->logFile )
-        {
-            throw new LogException( 'Missing log_file configuration parameter' );
-        }
-        
-        $this->monoLog = new Logger( $this->name );
-        
-        foreach( $this->types as $type )
-        {
-            $this->addHandler( $type );
-        }
-        
+
         $this->doAction( self::ON_INIT_ACTION );
     }
-    
+
     /**
      * Adds a handler to the log.
-     * 
-     * @param string $type handler type
-     * 
-     * @throws LogException if the requested handler type is not supported
+     *
+     * @param IHandler $handler the handler to add
+     *
+     * @action ON_LOG_ADD_HANDLER_ACTION
+     *
+     * @filter ON_ADD_HANDLER_FILTER(1)
      */
-    public function addHandler( $type )
+    public function addHandler( IHandler $handler )
     {
-        $handler = $this->_buildHandler( $type );
-        
-        if ( NULL === $handler )
-        {
-            throw new LogException( 'Unsupported log handler type: ' . $type );
-        }
-        
-        $this->monoLog->pushHandler( $handler );
-        
-        $this->doAction( self::ON_LOG_PUSH_HANDLER_ACTION );
+        $this->_handlers[] = $this->filter( self::ON_ADD_HANDLER_FILTER, $handler );
+
+        $this->doAction( self::ON_ADD_HANDLER_ACTION );
     }
-    
+
     /**
      * Returns a list of existing handlers.
-     * 
-     * @filter ON_LOG_GET_HANDLERS_FILTER
-     * 
+     *
+     * @filter ON_GET_HANDLERS_FILTER(1)
+     *
      * @return array list of handlers
      */
     public function getHandlers( )
     {
-        $handlers = array( );
-        
-        if ( NULL !== $this->monoLog )
-        {
-            $handlers = $this->monoLog->getHandlers( );
-        }
-        
-        return $this->filter( self::ON_LOG_GET_HANDLERS_FILTER, $handlers );
+        return $this->filter( self::ON_GET_HANDLERS_FILTER, $this->_handlers );
     }
-    
-    /**
-     * Closes all stream handlers.
-     * 
-     * @action ON_LOG_CLOSE_HANDLERS_ACTION
-     */
-    public function closeHandlers( )
-    {
-        if ( NULL !== $this->monoLog )
-        {
-            foreach( $this->monoLog->getHandlers( ) as $handler )
-            {
-                if ( $handler instanceof StreamHandler )
-                {
-                    $handler->close();
-                }
-            }
-        }
-        
-        $this->doAction( self::ON_LOG_CLOSE_HANDLERS_ACTION );
-    }
-    
+
     /**
      * Detailed debug log message.
-     * 
+     *
+     * Info useful to developers for debugging the application, not useful during operations.
+     *
      * @param string $message the log message
      */
     public function debug( $message )
     {
-        $this->_logIt( Logger::DEBUG, $message );
+        $this->_logIt( self::LEVEL_DEBUG, $message );
     }
-    
+
     /**
      * Interesting events log message.
-     * 
+     *
+     * Normal operational messages - may be harvested for reporting, measuring
+     * throughput, etc. - no action required.
+     *
      * @param string $message the log message
      */
     public function info( $message )
     {
-        $this->_logIt( Logger::INFO, $message );
+        $this->_logIt( self::LEVEL_INFO, $message );
     }
-    
+
     /**
      * Normal but significant event log message.
-     * 
+     *
+     * Events that are unusual but not error conditions - might be summarized in
+     * an email to developers or admins to spot potential problems - no immediate
+     * action required.
+     *
      * @param string $message the log message
      */
     public function notice( $message )
     {
-        $this->_logIt( Logger::NOTICE, $message );
+        $this->_logIt( self::LEVEL_NOTICE, $message );
     }
-    
+
     /**
      * Exceptional occurrences that are not errors log message.
-     * 
+     *
+     * Warning messages, not an error, but indication that an error will occur if
+     * action is not taken, e.g. file system 85% full - each item must be resolved
+     * within a given time.
+     *
      * @param string $message the log message
      */
     public function warning( $message )
     {
-        $this->_logIt( Logger::WARNING, $message );
+        $this->_logIt( self::LEVEL_WARNING, $message );
     }
-    
+
     /**
      * Runtime errors that do not require immediate attention
      * but should typically by logged and monitored messages.
-     * 
+     *
+     * Non-urgent failures, these should be relayed to developers or admins;
+     * each item must be resolved within a given time.
+     *
      * @param string $message the log message
      */
     public function error( $message )
     {
-        $this->_logIt( Logger::ERROR, $message );
+        $this->_logIt( self::LEVEL_ERROR, $message );
     }
-    
+
     /**
      * Critical conditions log messages.
-     * 
+     *
+     * Should be corrected immediately, but indicates failure in a secondary system,
+     * an example is a loss of a backup ISP connection.
+     *
      * @param string $message the log message
      */
     public function critical( $message )
     {
-        $this->_logIt( Logger::CRITICAL, $message );
+        $this->_logIt( self::LEVEL_CRITICAL, $message );
     }
-    
+
     /**
      * Action must be taken immediately log messages.
-     * 
+     *
+     * Should be corrected immediately, therefore notify staff who can fix the problem.
+     * An example would be the loss of a primary ISP connection.
+     *
      * @param string $message the log message
      */
     public function alert( $message )
     {
-        $this->_logIt( Logger::ALERT, $message );
+        $this->_logIt( self::LEVEL_ALERT, $message );
     }
-    
+
     /**
      * Emergency message: system is unusable.
-     * 
+     *
+     * A "panic" condition usually affecting multiple apps/servers/sites.
+     * At this level it would usually notify all tech staff on call.
+     *
      * @param string $message the log message
      */
     public function emergency( $message )
     {
-        $this->_logIt( Logger::EMERGENCY, $message );
+        $this->_logIt( self::LEVEL_EMERGENCY, $message );
     }
-    
+
     /**
      * Logs messages to the log.
-     * 
-     * @param int    $level   the error log level
-     * @param string $message the message to log
-     * 
+     *
+     * @param int    $level   the log level
+     * @param string $message the log message
+     *
      * @filter ON_LOG_IT_FILTER
      */
     private function _logIt( $level, $message )
     {
-        $this->monoLog->log( $level, $this->filter( self::ON_LOG_IT_FILTER, $message, $level ) );
-    }
-    
-    /**
-     * Returns a stream handler.
-     * 
-     * @param string $type handler type
-     * 
-     * @filter ON_LOG_BUILD_HANDLER_FILTER
-     * 
-     * @return IHandler the handler instance
-     */
-    private function _buildHandler( $type )
-    {
-        $handler = NULL;
-        
-        switch( $type )
+        foreach( $this->_handlers as $handler )
         {
-            case self::HANDLER_STANDARD_LOG:
-                $handler = new LogHandler( $this->logFile );
+            $args[ 'message' ] = $message;
+
+            $record = $handler->createRecord( $level, $args );
+
+            $handler->handle( $record );
+        }
+    }
+
+    /**
+     * Returns the level as string.
+     *
+     * @param int $level the level number
+     *
+     * @return string the level label
+     */
+    public static function getLevelString( $level )
+    {
+        $name = '';
+
+        switch( $level )
+        {
+            case self::LEVEL_DEBUG:
+                $name = 'DEBUG';
                 break;
-                
-            case self::HANDLER_ROTATE_LOG:
-                $handler = new RotatingLogHandler( $this->logFile, $this->maxFiles );
+
+            case self::LEVEL_INFO:
+                $name = 'INFO';
                 break;
-            
-            case self::HANDLER_RAW_MAIL:
-                if ( NULL === $this->mailer )
-                {
-                    throw new MailException( 'The mailer cannot be NULL' );
-                }
-                if ( NULL == $this->to )
-                {
-                    throw new MailException( 'Missing TO: parameter on RawMailHandler' );
-                }
-                
-                $this->mailer->addTo( $this->to );
-                $this->mailer->setSubject( $this->subject );
-                
-                $handler = new RawMailHandler( $this, $this->mailer );
-                
-                if ( NULL !== $this->formatCallback )
-                {
-                    $this->addFilter( RawMailHandler::ON_RAW_MAIL_HANDLER_SEND_FILTER, $this->formatCallback );
-                }
+
+            case self::LEVEL_NOTICE:
+                $name = 'NOTICE';
                 break;
-                
+
+            case self::LEVEL_WARNING:
+                $name = 'WARNING';
+                break;
+
+            case self::LEVEL_ERROR:
+                $name = 'ERROR';
+                break;
+
+            case self::LEVEL_CRITICAL:
+                $name = 'CRITICAL';
+                break;
+
+            case self::LEVEL_ALERT:
+                $name = 'ALERT';
+                break;
+
+            case self::LEVEL_EMERGENCY:
+                $name = 'EMERGENCY';
+                break;
+
             default:
-                // do nothing
+                $name = '';
                 break;
         }
-        
-        return $this->filter( self::ON_LOG_BUILD_HANDLER_FILTER, $handler, $type );
+
+        return $name;
     }
-    
-    /**
-     * Checks that the requested handler implements IHandler interface.
-     * 
-     * @param mixed  $handler the constructed handler
-     * @param string $type    requested handler type
-     * 
-     * @return IHandler the valid handler
-     * 
-     * @throws LogException if handler is not IHandler
-     */
-    public function isIHandlerFilter( $handler, $type )
-    {
-        if ( !$handler instanceof IHandler )
-        {
-            throw new LogException( get_class( $handler ) . ' is not a IHandler. Requested( ' . $type . ' )' );
-        }
-        
-        return $handler;
-    }
-    
-    // handler types
-    const HANDLER_STANDARD_LOG              = 'standard_log';
-    const HANDLER_ROTATE_LOG                = 'rotate_log';
-    const HANDLER_RAW_MAIL                  = 'raw_mail';
-    
+
+    // log levels
+    const LEVEL_DEBUG                       = 0;
+    const LEVEL_INFO                        = 1;
+    const LEVEL_NOTICE                      = 2;
+    const LEVEL_WARNING                     = 3;
+    const LEVEL_ERROR                       = 4;
+    const LEVEL_CRITICAL                    = 5;
+    const LEVEL_ALERT                       = 6;
+    const LEVEL_EMERGENCY                   = 7;
+
+
     // actions
-    const ON_INIT_ACTION                    = 'on_log_init_action';
-    const ON_LOG_PUSH_HANDLER_ACTION        = 'on_log_push_handler_action';
-    const ON_LOG_CLOSE_HANDLERS_ACTION      = 'on_log_close_handlers_action';
-    
+    const ON_INIT_ACTION                    = 'on_init_action';
+    const ON_ADD_HANDLER_ACTION             = 'on_push_handler_action';
+
     // filters
     const ON_LOG_IT_FILTER                  = 'on_log_it_filter';
-    const ON_LOG_BUILD_HANDLER_FILTER       = 'on_log_get_handler_filter';
-    const ON_LOG_GET_HANDLERS_FILTER        = 'on_log_get_handlers_filter';
+    const ON_GET_HANDLERS_FILTER            = 'on_get_handlers_filter';
+    const ON_ADD_HANDLER_FILTER             = 'on_add_handler_filter';
 }

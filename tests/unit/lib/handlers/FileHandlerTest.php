@@ -26,89 +26,91 @@
  * PHP version 5.3
  *
  * @category  PHP
- * @package   RawPHP/RawLog
+ * @package   RawPHP/RawLog/Handlers/Tests
  * @author    Tom Kaczohca <tom@rawphp.org>
  * @copyright 2014 Tom Kaczocha
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
 
-namespace RawPHP\RawLog;
+namespace RawPHP\RawLog\Handlers\Tests;
 
-use RawPHP\RawLog\IRecord;
+use RawPHP\RawLog\Handlers\FileHandler;
+use RawPHP\RawLog\Log;
+use RawPHP\RawLog\Records\ErrorLogRecord;
+use RawPHP\RawLog\Formatters\ErrorLogFormatter;
 
 /**
- * The log handler interface.
+ * FileHandlerTest
  *
  * @category  PHP
- * @package   RawPHP/RawLog
+ * @package   RawPHP/RawLog/Handlers/Tests
  * @author    Tom Kaczocha <tom@rawphp.org>
  * @copyright 2014 Tom Kaczocha
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
-interface IHandler
+class FileHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Initialises the handler.
-     *
-     * @param array $config configuration array
-     *
-     * @action ON_INIT_ACTION
+     * @var FileHandler
      */
-    public function init( $config = array( ) );
+    public $handler;
+
+    private $_file;
 
     /**
-     * Returns the minimum log level.
-     *
-     * @filter ON_GET_LEVEL_FILTER(1)
-     *
-     * @return int log level
+     * Setup before each test.
      */
-    public function getLevel( );
+    public function setup( )
+    {
+        $this->_file = OUTPUT_DIR . 'log.txt';
+
+        $config = array(
+            'file' => $this->_file,
+            'level' => Log::LEVEL_DEBUG,
+        );
+
+        $this->handler = new FileHandler( $config );
+    }
 
     /**
-     * Returns the formatter to be used with this handler.
-     *
-     * @filter ON_GET_FORMATTER_FILTER(1)
-     *
-     * @return IFormatter the formatter
+     * Cleanup after each test.
      */
-    public function getFormatter( );
+    public function tearDown( )
+    {
+        $this->handler = NULL;
+
+        if ( file_exists( $this->_file ) )
+        {
+            unlink( $this->_file );
+        }
+    }
 
     /**
-     * Sets the formatter for this handler.
-     *
-     * @param IFormatter $formatter the formatter
-     *
-     * @filter ON_SET_FORMATTER_FILTER(1)
+     * Test file handler instantiated correctly.
      */
-    public function setFormatter( IFormatter $formatter );
+    public function testFileHandlerInstantiatedCorrectly( )
+    {
+        $this->assertNotNull( $this->handler );
+    }
 
     /**
-     * Creates and returns a new record.
-     *
-     * @param int   $level the log level
-     * @param array $args  the log message
-     *
-     * @filter ON_CREATE_RECORD_FILTER(3)
-     *
-     * @return IRecord the record instance
+     * Test logging debug message.
      */
-    public function createRecord( $level, array $args );
+    public function testLogDebugMessage( )
+    {
+        $record = new ErrorLogRecord( Log::LEVEL_DEBUG, 'Test message' );
 
-    /**
-     * Handles the logging.
-     *
-     * This method calls FileHandler::getFormatter() which means that
-     * you can use the filter to alter the format if desired.
-     *
-     * @param IRecord $record the record to log
-     *
-     * @action ON_BEFORE_HANDLE_ACTION
-     * @action ON_AFTER_HANDLE_ACTION
-     *
-     * @throws LogException if it fails to create the file.
-     */
-    public function handle( IRecord $record );
+        $this->handler->setFormatter( new ErrorLogFormatter( ) );
+
+        $this->handler->handle( $record );
+
+        $this->assertFileExists( $this->_file );
+
+        $result = file_get_contents( $this->_file );
+
+        $this->assertNotFalse( strstr( $result, '[DEBUG]' ) );
+        $this->assertNotFalse( strstr( $result, 'Test message' ) );
+    }
 }

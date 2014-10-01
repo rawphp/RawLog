@@ -26,89 +26,68 @@
  * PHP version 5.3
  *
  * @category  PHP
- * @package   RawPHP/RawLog
+ * @package   RawPHP/RawLog/Formatters
  * @author    Tom Kaczohca <tom@rawphp.org>
  * @copyright 2014 Tom Kaczocha
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
 
-namespace RawPHP\RawLog;
+namespace RawPHP\RawLog\Formatters;
 
+use RawPHP\RawBase\Component;
+use RawPHP\RawLog\IFormatter;
 use RawPHP\RawLog\IRecord;
+use RawPHP\RawLog\Records\MailLogRecord;
 
 /**
- * The log handler interface.
+ * MailLogFormatter
  *
  * @category  PHP
- * @package   RawPHP/RawLog
+ * @package   RawPHP/RawLog/Formatters
  * @author    Tom Kaczocha <tom@rawphp.org>
  * @copyright 2014 Tom Kaczocha
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
-interface IHandler
+class MailLogFormatter extends Component implements IFormatter
 {
     /**
-     * Initialises the handler.
+     * Formats the log record as a string.
      *
-     * @param array $config configuration array
+     * @param IRecord $record the log record
      *
-     * @action ON_INIT_ACTION
+     * @filter ON_FORMAT_FILTER(2)
+     *
+     * @throws LogException if record is of the wrong type
+     *
+     * @return string the formatted log HTML
      */
-    public function init( $config = array( ) );
+    public function format( IRecord $record )
+    {
+        if ( !$record instanceof MailLogRecord )
+        {
+            throw new LogException( 'Record must be an instance of MailLogRecord' );
+        }
 
-    /**
-     * Returns the minimum log level.
-     *
-     * @filter ON_GET_LEVEL_FILTER(1)
-     *
-     * @return int log level
-     */
-    public function getLevel( );
+        $title = $record->getTitle( );
+        $heading = $record->getHeading( );
+        $body  = $record->getBody( );
 
-    /**
-     * Returns the formatter to be used with this handler.
-     *
-     * @filter ON_GET_FORMATTER_FILTER(1)
-     *
-     * @return IFormatter the formatter
-     */
-    public function getFormatter( );
+        $html =
+            "<html>
+                <head>
+                    <title>$title</title>
+                </head>
+                <body>
+                    <h1>$title</h1>
+                    <h5>$heading</h5>
+                    <p>$body</p>
+                </body>
+            </html>";
 
-    /**
-     * Sets the formatter for this handler.
-     *
-     * @param IFormatter $formatter the formatter
-     *
-     * @filter ON_SET_FORMATTER_FILTER(1)
-     */
-    public function setFormatter( IFormatter $formatter );
+        return $this->filter( self::ON_FORMAT_FILTER, $html, $record );
+    }
 
-    /**
-     * Creates and returns a new record.
-     *
-     * @param int   $level the log level
-     * @param array $args  the log message
-     *
-     * @filter ON_CREATE_RECORD_FILTER(3)
-     *
-     * @return IRecord the record instance
-     */
-    public function createRecord( $level, array $args );
-
-    /**
-     * Handles the logging.
-     *
-     * This method calls FileHandler::getFormatter() which means that
-     * you can use the filter to alter the format if desired.
-     *
-     * @param IRecord $record the record to log
-     *
-     * @action ON_BEFORE_HANDLE_ACTION
-     * @action ON_AFTER_HANDLE_ACTION
-     *
-     * @throws LogException if it fails to create the file.
-     */
-    public function handle( IRecord $record );
+    const ON_FORMAT_FILTER          = 'on_format_filter';
 }
