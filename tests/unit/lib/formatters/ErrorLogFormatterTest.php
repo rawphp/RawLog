@@ -92,7 +92,8 @@ class ErrorLogFormatterTest extends \PHPUnit_Framework_TestCase
 
         $record->setDate( $date );
 
-        $expected = '[Wed Oct 01 23:14:55 EST] [ERROR] [-] This is the error message' . PHP_EOL;
+        $expected  = '[Wed Oct 01 23:14:55 EST] [ERROR] [-] This is the error message';
+        $expected .= PHP_EOL;
 
         $this->assertEquals( $expected, $this->formatter->format( $record ) );
     }
