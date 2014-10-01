@@ -42,14 +42,30 @@ Alternatively, just copy the contents of the RawLog folder into somewhere that's
 use RawPHP\RawLog\Log;
 
 // configuration
-// email settings obviously not required if not using Log::HANDLER_RAW_MAIL
+// email settings obviously not required if not using MailHandler
+
 $config = array(
-    'log_file'    => '/path/to/log.txt',
-    'log_name'    => 'test-log',
-    'log_type'    => array(
-        Log::HANDLER_STANDARD_LOG,
-        Log::HANDLER_ROTATE_LOG,
-        Log::HANDLER_RAW_MAIL
+    
+    class => 'RawPHP\\RawLog\\Log',
+    debug =>  FALSE,
+    $handlers = array(
+        'standard_log' = array( 
+            class     => 'RawPHP\\RawLog\\Handlers\\FileHandler',
+            file      => '/path/to/log.txt',
+            formatter => 'RawPHP\\RawLog\\Formatters\\ErrorLogFormatter',
+            level     => 0, // debug
+        ),
+        rotate_log = array(
+            class     => 'RawPHP\\RawLog\\Handlers\\RotatingFileHandler',
+            file      => '/path/to/rotate.txt',
+            formatter => 'RawPHP\\RawLog\\Formatters\\ErrorLogFormatter',
+            level     => 2, // notice
+        ),
+        mail = array( 
+            class     => 'RawPHP\\RawLog\\Handlers\\MailHandler',
+            formatter => 'RawPHP\\RawLog\\Formatters\\MailLogFormatter',
+            level     => 4, // error
+        ),
     ),
 
     'from_email'  => 'no-reply@rawphp.org',              // default from email to use in log emails
@@ -67,10 +83,7 @@ $config = array(
 );
 
 // get new instance
-$log = new Log( );
-
-// initialise the log
-$log->init( $config );
+$log = new Log( $config );
 
 // use cases
 $log->debug( 'message' );
