@@ -86,6 +86,7 @@ class ErrorLogFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $record = new ErrorLogRecord( Log::LEVEL_ERROR, 'This is the error message' );
         $date  = new \DateTime( );
+        $date->setTimezone( new \DateTimeZone( 'EST' ) );
         $date->setDate( 2014, 10, 01 );
         $date->setTime( 23, 14, 55 );
 
