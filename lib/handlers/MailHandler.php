@@ -36,7 +36,6 @@
 namespace RawPHP\RawLog\Handlers;
 
 use RawPHP\RawBase\Component;
-use RawPHP\RawMail\IMail;
 use RawPHP\RawLog\IHandler;
 use RawPHP\RawLog\Log;
 use RawPHP\RawLog\IFormatter;
