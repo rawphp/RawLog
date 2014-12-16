@@ -26,24 +26,60 @@
  * PHP version 5.3
  *
  * @category  PHP
- * @package   RawPHP\RawLog\Tests
+ * @package   RawPHP\RawLog\Formatter
  * @author    Tom Kaczocha <tom@rawphp.org>
  * @copyright 2014 Tom Kaczocha
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace RawPHP\RawLog\Formatter;
 
-global $config;
+use RawPHP\RawLog\Contract\IFormatter;
+use RawPHP\RawLog\Contract\IRecord;
+use RawPHP\RawLog\Exception\LogException;
+use RawPHP\RawLog\Log;
+use RawPHP\RawLog\Record\ErrorLogRecord;
 
-$config = include_once 'resources/config.php';
+/**
+ * The Common Log Format formatter.
+ *
+ * @category  PHP
+ * @package   RawPHP\RawLog\Formatter
+ * @author    Tom Kaczocha <tom@rawphp.org>
+ * @copyright 2014 Tom Kaczocha
+ * @license   http://rawphp.org/license.txt MIT
+ * @link      http://rawphp.org/
+ */
+class ErrorLogFormatter implements IFormatter
+{
+    /**
+     * Formats the log record as a string.
+     *
+     * @param IRecord $record the log record
+     *
+     * @return string if record is of the wrong type
+     *
+     * @throws LogException
+     */
+    public function format( IRecord $record )
+    {
+        if ( !$record instanceof ErrorLogRecord )
+        {
+            throw new LogException( 'Record must be an instance of ErrorLogRecord' );
+        }
 
-$date = new DateTime();
+        $format = '[%s] [%s] [%s] %s';
 
-define( 'OUTPUT_DIR', __DIR__ . '/output/' );
+        $result = sprintf( $format,
+                           $record->getDate()->format( 'D M d G:i:s T' ),
+                           Log::getLevelString( $record->getLevel() ),
+                           $record->getClientIP(),
+                           $record->getText()
+        );
 
-$config[ 'handlers' ][ 'standard_log' ][ 'file' ] = OUTPUT_DIR . $config[ 'handlers' ][ 'standard_log' ][ 'file' ];
-$config[ 'handlers' ][ 'rotate_log' ][ 'file' ]   = OUTPUT_DIR . 'rotate-' . $date->format( 'd-m-Y' ) . '.txt';
+        $result .= PHP_EOL;
 
-echo PHP_EOL . PHP_EOL . '************* BOOTSTRAP ********************' . PHP_EOL . PHP_EOL;
+        return $result;
+    }
+}

@@ -26,24 +26,27 @@
  * PHP version 5.3
  *
  * @category  PHP
- * @package   RawPHP\RawLog\Tests
+ * @package   RawPHP\RawLog\Exception
  * @author    Tom Kaczocha <tom@rawphp.org>
  * @copyright 2014 Tom Kaczocha
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace RawPHP\RawLog\Exception;
 
-global $config;
+use RawPHP\RawSupport\Exception\RawException;
 
-$config = include_once 'resources/config.php';
-
-$date = new DateTime();
-
-define( 'OUTPUT_DIR', __DIR__ . '/output/' );
-
-$config[ 'handlers' ][ 'standard_log' ][ 'file' ] = OUTPUT_DIR . $config[ 'handlers' ][ 'standard_log' ][ 'file' ];
-$config[ 'handlers' ][ 'rotate_log' ][ 'file' ]   = OUTPUT_DIR . 'rotate-' . $date->format( 'd-m-Y' ) . '.txt';
-
-echo PHP_EOL . PHP_EOL . '************* BOOTSTRAP ********************' . PHP_EOL . PHP_EOL;
+/**
+ * Exception thrown when there are problems with the logger.
+ *
+ * @category  PHP
+ * @package   RawPHP/RawLog
+ * @author    Tom Kaczocha <tom@rawphp.org>
+ * @copyright 2014 Tom Kaczocha
+ * @license   http://rawphp.org/license.txt MIT
+ * @link      http://rawphp.org/
+ */
+class LogException extends RawException
+{
+}

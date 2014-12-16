@@ -26,24 +26,33 @@
  * PHP version 5.3
  *
  * @category  PHP
- * @package   RawPHP\RawLog\Tests
+ * @package   RawPHP\RawLog\Contract
  * @author    Tom Kaczocha <tom@rawphp.org>
  * @copyright 2014 Tom Kaczocha
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+namespace RawPHP\RawLog\Contract;
 
-global $config;
-
-$config = include_once 'resources/config.php';
-
-$date = new DateTime();
-
-define( 'OUTPUT_DIR', __DIR__ . '/output/' );
-
-$config[ 'handlers' ][ 'standard_log' ][ 'file' ] = OUTPUT_DIR . $config[ 'handlers' ][ 'standard_log' ][ 'file' ];
-$config[ 'handlers' ][ 'rotate_log' ][ 'file' ]   = OUTPUT_DIR . 'rotate-' . $date->format( 'd-m-Y' ) . '.txt';
-
-echo PHP_EOL . PHP_EOL . '************* BOOTSTRAP ********************' . PHP_EOL . PHP_EOL;
+/**
+ * The record formatter interface.
+ *
+ * @category  PHP
+ * @package   RawPHP\RawLog\Contract
+ * @author    Tom Kaczocha <tom@rawphp.org>
+ * @copyright 2014 Tom Kaczocha
+ * @license   http://rawphp.org/license.txt MIT
+ * @link      http://rawphp.org/
+ */
+interface IFormatter
+{
+    /**
+     * Formats the log record as a string.
+     *
+     * @param IRecord $record the log record
+     *
+     * @return string the formatted log text
+     */
+    public function format( IRecord $record );
+}
