@@ -39,6 +39,7 @@ use DateTime;
 use DateTimeZone;
 use PHPUnit_Framework_TestCase;
 use RawPHP\RawLog\Formatter\ErrorLogFormatter;
+use RawPHP\RawLog\Log;
 use RawPHP\RawLog\Record\ErrorLogRecord;
 
 /**

@@ -35,6 +35,7 @@
 
 namespace RawPHP\RawLog;
 
+use Psr\Log\LoggerInterface;
 use RawPHP\RawLog\Contract\IHandler;
 use RawPHP\RawLog\Contract\ILog;
 use RawPHP\RawLog\Exception\LogException;
@@ -49,11 +50,9 @@ use RawPHP\RawLog\Exception\LogException;
  * @license   http://rawphp.org/license.txt MIT
  * @link      http://rawphp.org/
  */
-class Log implements ILog
+class Log implements ILog, LoggerInterface
 {
-    /**
-     * @var array
-     */
+    /** @var  array */
     private $_handlers = [ ];
 
     /**
@@ -68,8 +67,6 @@ class Log implements ILog
      * Initialises the log.
      *
      * @param array $config configuration array
-     *
-     * @action ON_INIT_ACTION
      *
      * @throws LogException if log file is missing
      */
@@ -113,10 +110,13 @@ class Log implements ILog
      * Info useful to developers for debugging the application, not useful during operations.
      *
      * @param string $message the log message
+     * @param array  $context
+     *
+     * @return null|void
      */
-    public function debug( $message )
+    public function debug( $message, array $context = [ ] )
     {
-        $this->_logIt( self::LEVEL_DEBUG, $message );
+        $this->_logIt( self::LEVEL_DEBUG, $message, $context );
     }
 
     /**
@@ -126,10 +126,13 @@ class Log implements ILog
      * throughput, etc. - no action required.
      *
      * @param string $message the log message
+     * @param array  $context
+     *
+     * @return null|void
      */
-    public function info( $message )
+    public function info( $message, array $context = [ ] )
     {
-        $this->_logIt( self::LEVEL_INFO, $message );
+        $this->_logIt( self::LEVEL_INFO, $message, $context );
     }
 
     /**
@@ -140,10 +143,13 @@ class Log implements ILog
      * action required.
      *
      * @param string $message the log message
+     * @param array  $context
+     *
+     * @return null|void
      */
-    public function notice( $message )
+    public function notice( $message, array $context = [ ] )
     {
-        $this->_logIt( self::LEVEL_NOTICE, $message );
+        $this->_logIt( self::LEVEL_NOTICE, $message, $context );
     }
 
     /**
@@ -154,10 +160,13 @@ class Log implements ILog
      * within a given time.
      *
      * @param string $message the log message
+     * @param array  $context
+     *
+     * @return null|void
      */
-    public function warning( $message )
+    public function warning( $message, array $context = [ ] )
     {
-        $this->_logIt( self::LEVEL_WARNING, $message );
+        $this->_logIt( self::LEVEL_WARNING, $message, $context );
     }
 
     /**
@@ -168,10 +177,13 @@ class Log implements ILog
      * each item must be resolved within a given time.
      *
      * @param string $message the log message
+     * @param array  $context
+     *
+     * @return null|void
      */
-    public function error( $message )
+    public function error( $message, array $context = [ ] )
     {
-        $this->_logIt( self::LEVEL_ERROR, $message );
+        $this->_logIt( self::LEVEL_ERROR, $message, $context );
     }
 
     /**
@@ -181,10 +193,13 @@ class Log implements ILog
      * an example is a loss of a backup ISP connection.
      *
      * @param string $message the log message
+     * @param array  $context
+     *
+     * @return null|void
      */
-    public function critical( $message )
+    public function critical( $message, array $context = [ ] )
     {
-        $this->_logIt( self::LEVEL_CRITICAL, $message );
+        $this->_logIt( self::LEVEL_CRITICAL, $message, $context );
     }
 
     /**
@@ -194,10 +209,13 @@ class Log implements ILog
      * An example would be the loss of a primary ISP connection.
      *
      * @param string $message the log message
+     * @param array  $context
+     *
+     * @return null|void
      */
-    public function alert( $message )
+    public function alert( $message, array $context = [ ] )
     {
-        $this->_logIt( self::LEVEL_ALERT, $message );
+        $this->_logIt( self::LEVEL_ALERT, $message, $context );
     }
 
     /**
@@ -207,10 +225,27 @@ class Log implements ILog
      * At this level it would usually notify all tech staff on call.
      *
      * @param string $message the log message
+     * @param array  $context
+     *
+     * @return null|void
      */
-    public function emergency( $message )
+    public function emergency( $message, array $context = [ ] )
     {
-        $this->_logIt( self::LEVEL_EMERGENCY, $message );
+        $this->_logIt( self::LEVEL_EMERGENCY, $message, $context );
+    }
+
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param int    $level
+     * @param string $message
+     * @param array  $context
+     *
+     * @return null
+     */
+    public function log( $level, $message, array $context = [ ] )
+    {
+        $this->_logIt( $level, $message, $context );
     }
 
     /**
@@ -218,14 +253,16 @@ class Log implements ILog
      *
      * @param int    $level   the log level
      * @param string $message the log message
+     * @param array  $context
      */
-    private function _logIt( $level, $message )
+    private function _logIt( $level, $message, $context = [ ] )
     {
         foreach ( $this->_handlers as $handler )
         {
             $args[ 'message' ] = $message;
 
-            $record = $handler->createRecord( $level, $args );
+            /** @var IHandler $handler */
+            $record = $handler->createRecord( $level, $args, $context );
 
             $handler->handle( $record );
         }
